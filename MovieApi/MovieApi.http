@@ -1,6 +1,14 @@
 @MovieApi_HostAddress = http://localhost:5053
 
-GET {{MovieApi_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{MovieApi_HostAddress}}/api/seed
+
+###
+
+POST {{MovieApi_HostAddress}}/api/recommend
+Content-Type: application/json
+
+{
+	"mood": "funny and clever"
+}
 
 ###

@@ -4,13 +4,22 @@ A full-stack web application that recommends movies based on mood using AI embed
 
 ## Tech Stack
 - React + Vite (frontend)
-- .NET 9 Web API (backend)
+- .NET 10 Web API (backend)
 - PostgreSQL + pgvector (database)
 - OpenAI text-embedding-3-small (AI embeddings)
 
 ## How it works
 
-When you type a mood like "something funny and clever", the app sends that text to OpenAI which converts it into a list of 1536 numbers. Each number captures a tiny piece of the meaning of your words. Every movie description in the database was converted the same way when the app was seeded. PostgreSQL then compares your 1536 numbers against every movie by measuring how similar the directions of the two number lists are. Movies whose numbers point in the most similar direction to yours come back as the top matches. The closer the direction, the higher the match percentage shown on the card.
+When you type a mood like "something funny and clever", the API sends that text to OpenAI and gets back 1536 numbers. That list of numbers is the embedding. Each movie description is stored the same way in the database. pgvector compares the search numbers with each movie's numbers and finds the three movie descriptions that point most closely in the same direction. That is why the app can find related movies even when the exact words do not match.
+
+## API Endpoints
+
+- POST /api/seed
+- POST /api/recommend
+
+`POST /api/seed` inserts the assignment's fixed list of 30 movies and stores an embedding for each description.
+
+`POST /api/recommend` accepts `{ "mood": "..." }`, creates an embedding for the mood text, and returns the top 3 closest movies with scores.
 
 ## Running the app
 
@@ -19,7 +28,10 @@ Development secrets:
 
 Start the API:
 cd MovieApi
-dotnet run --urls "http://localhost:5000"
+dotnet run --urls "http://localhost:5053"
+
+Seed the database once the API is running:
+Invoke-RestMethod -Method Post -Uri "http://localhost:5053/api/seed"
 
 Start the frontend:
 cd movie-ui
