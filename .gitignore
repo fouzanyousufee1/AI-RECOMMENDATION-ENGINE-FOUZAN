@@ -1,0 +1,28 @@
+# Ignore everything by default at the Documents root
+*
+
+# Keep this file tracked
+!.gitignore
+
+# Track only the application folders for this repository
+!MovieApi/
+!movie-ui/
+
+# Re-include contents under tracked folders
+!MovieApi/**
+!movie-ui/**
+
+# Backend build output
+MovieApi/bin/
+MovieApi/obj/
+
+# Frontend dependencies and build output
+movie-ui/node_modules/
+movie-ui/dist/
+
+# Local secrets
+MovieApi/appsettings.Development.json
+
+# OS/editor noise
+**/.DS_Store
+**/Thumbs.db
