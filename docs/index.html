@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Movie Recommendation Engine — Documentation</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #21262d;
+      --border: #30363d;
+      --text: #e6edf1;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --accent2: #f78166;
+      --green: #3fb950;
+      --purple: #bc8cff;
+      --yellow: #e3b341;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 40%, #1a1f2e 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 72px 32px 56px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(88,166,255,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-icon { font-size: 64px; margin-bottom: 20px; display: block; }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+      background: linear-gradient(120deg, #58a6ff, #bc8cff 60%, #f78166);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 28px;
+      font-size: 17px;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .badge-row img { height: 28px; border-radius: 4px; }
+
+    /* GitHub Buttons */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity .18s, transform .18s;
+    }
+    .btn:hover { opacity: .85; transform: translateY(-1px); }
+    .btn-profile {
+      background: #238636;
+      color: #fff;
+      border: 1px solid #2ea043;
+    }
+    .btn-repo {
+      background: var(--bg3);
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+    .btn svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 1080px; margin: 0 auto; padding: 48px 24px; }
+
+    /* ── NAV ── */
+    .toc {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 48px;
+    }
+    .toc h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 14px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin: 6px 0; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* ── SECTIONS ── */
+    section { margin-bottom: 56px; }
+    section h2 {
+      font-size: 22px;
+      font-weight: 700;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 24px 0 10px;
+    }
+    p { margin-bottom: 14px; color: #c9d1d9; }
+
+    /* ── CARDS ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .card-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+    .card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .card p { font-size: 13px; color: var(--muted); margin: 0; }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; margin: 16px 0; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: var(--bg3); }
+    thead th { padding: 12px 16px; text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+    tbody tr { border-top: 1px solid var(--border); }
+    tbody tr:hover { background: rgba(88,166,255,.04); }
+    td { padding: 11px 16px; vertical-align: top; }
+    td code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-size: 12.5px; color: var(--purple); }
+
+    /* ── CODE ── */
+    pre {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.65;
+      margin: 12px 0 20px;
+      position: relative;
+    }
+    code { font-family: "Cascadia Code", "Fira Code", Consolas, monospace; }
+    pre code { color: #e6edf1; }
+    .kw   { color: #ff7b72; }   /* keywords */
+    .str  { color: #a5d6ff; }   /* strings */
+    .cmt  { color: #8b949e; font-style: italic; } /* comments */
+    .fn   { color: #d2a8ff; }   /* functions */
+    .num  { color: #79c0ff; }   /* numbers */
+    .typ  { color: #ffa657; }   /* types */
+    .op   { color: #79c0ff; }   /* operators */
+    .sql-kw { color: #ff7b72; }
+    .sql-fn { color: #d2a8ff; }
+
+    .lang-tag {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: "Cascadia Code", monospace;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 16px 0 24px;
+      overflow-x: auto;
+    }
+    .flow table { border-collapse: separate; border-spacing: 0; }
+    .flow td { border: none; padding: 6px 10px; white-space: nowrap; }
+    .box {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .box-blue   { background: rgba(88,166,255,.15);  border: 1px solid rgba(88,166,255,.4);  color: #58a6ff; }
+    .box-green  { background: rgba(63,185,80,.13);   border: 1px solid rgba(63,185,80,.4);   color: #3fb950; }
+    .box-purple { background: rgba(188,140,255,.13); border: 1px solid rgba(188,140,255,.4); color: #bc8cff; }
+    .box-orange { background: rgba(247,129,102,.13); border: 1px solid rgba(247,129,102,.4); color: #f78166; }
+    .arrow { color: var(--muted); font-size: 18px; padding: 0 4px; }
+
+    /* ── ENDPOINT CARDS ── */
+    .endpoint {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+    .method {
+      padding: 3px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: monospace;
+      letter-spacing: .05em;
+    }
+    .method-post { background: rgba(63,185,80,.2); color: #3fb950; border: 1px solid rgba(63,185,80,.4); }
+    .endpoint-path { font-family: monospace; font-size: 16px; color: var(--text); }
+    .endpoint-body { padding: 20px; }
+    .endpoint-body p { margin-bottom: 10px; font-size: 14px; }
+
+    /* ── STEPS ── */
+    .steps { counter-reset: step; }
+    .step {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .step-num {
+      counter-increment: step;
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: #000;
+      font-weight: 800;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    .step-content h4 { font-size: 15px; margin-bottom: 8px; }
+    .step-content p  { font-size: 13.5px; margin-bottom: 8px; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-left: 4px solid;
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .callout-blue   { border-color: var(--accent);  background: rgba(88,166,255,.07);  }
+    .callout-yellow { border-color: var(--yellow);  background: rgba(227,179,65,.07);  color: #e3b341; }
+    .callout-green  { border-color: var(--green);   background: rgba(63,185,80,.07);   }
+
+    /* ── FILE TREE ── */
+    .tree {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 13px;
+      line-height: 2;
+    }
+    .tree .dir  { color: var(--accent);  font-weight: 700; }
+    .tree .file { color: #c9d1d9; }
+    .tree .ann  { color: var(--muted);   font-style: italic; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .footer-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 20px; }
+
+    /* ── MISC ── */
+    .inline-code {
+      background: var(--bg3);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--purple);
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(88,166,255,.12);
+      color: var(--accent);
+      border: 1px solid rgba(88,166,255,.25);
+      margin: 2px 3px;
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 48px 20px 40px; }
+      .page { padding: 32px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ HERO ══════════════ -->
+<div class="hero">
+  <span class="hero-icon">🎬</span>
+  <h1>AI Movie Recommendation Engine</h1>
+  <p>
+    Type a mood — get the three most semantically relevant movies from a 30-film library
+    using real OpenAI embeddings and pgvector cosine similarity.
+  </p>
+
+  <div class="badge-row">
+    <img src="https://img.shields.io/badge/.NET_10-512BD4?style=flat-square&logo=dotnet&logoColor=white" alt=".NET 10" />
+    <img src="https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React 19" />
+    <img src="https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+    <img src="https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white" alt="OpenAI" />
+    <img src="https://img.shields.io/badge/pgvector-0.3.x-orange?style=flat-square" alt="pgvector" />
+  </div>
+
+  <div class="btn-row">
+    <a class="btn btn-profile" href="https://github.com/fouzanyousufee1" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.68 7.68 0 012 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub Profile
+    </a>
+    <a class="btn btn-repo" href="https://github.com/fouzanyousufee1/AI-RECOMMENDATION-ENGINE" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 16 16"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"/></svg>
+      View Repository
+    </a>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<div class="page">
+
+  <!-- TABLE OF CONTENTS -->
+  <nav class="toc">
+    <h2>Table of Contents</h2>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#project-structure">Project Structure</a></li>
+      <li><a href="#tech-stack">Tech Stack</a></li>
+      <li><a href="#api-reference">API Reference</a></li>
+      <li><a href="#database">Database Schema</a></li>
+      <li><a href="#key-code">Key Code Explained</a></li>
+      <li><a href="#setup">Local Setup</a></li>
+      <li><a href="#running">Running the App</a></li>
+      <li><a href="#frontend">Frontend UI</a></li>
+      <li><a href="#config">Configuration Reference</a></li>
+      <li><a href="#security">Security Notes</a></li>
+    </ol>
+  </nav>
+
+  <!-- ── OVERVIEW ── -->
+  <section id="overview">
+    <h2>📋 Overview</h2>
+    <p>
+      This is a full-stack AI-powered movie recommendation application built in four weeks as part
+      of a software engineering assignment. A user types a natural-language mood description and
+      receives the three most contextually relevant movies from a curated 30-film library.
+    </p>
+    <p>
+      The recommendation engine uses <strong>semantic search</strong>: every movie description and
+      every mood query is converted into a 1536-dimensional floating-point vector by the OpenAI
+      <span class="inline-code">text-embedding-3-small</span> model. The PostgreSQL <strong>pgvector</strong>
+      extension computes cosine distance between vectors in pure SQL, making matching fast and precise.
+    </p>
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">🧠</span>
+        <h4>AI Embeddings</h4>
+        <p>OpenAI converts text to 1536 numbers that encode meaning, not just words.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📐</span>
+        <h4>Vector Search</h4>
+        <p>pgvector's <code>&lt;=&gt;</code> operator finds the closest vectors in milliseconds.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">⚡</span>
+        <h4>Full-Stack</h4>
+        <p>React 19 frontend talks to an ASP.NET Core .NET 10 REST API backed by PostgreSQL.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🎨</span>
+        <h4>Animated UI</h4>
+        <p>Drifting gradient background with floating color blobs and glass-morphism panels.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section id="how-it-works">
+    <h2>⚙️ How It Works</h2>
+    <p>The recommendation flow from user input to movie results:</p>
+
+    <div class="flow">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:center;">
+        <span class="box box-blue">User types mood</span>
+        <span class="arrow">→</span>
+        <span class="box box-blue">React frontend</span>
+        <span class="arrow">→ POST /api/recommend →</span>
+        <span class="box box-green">.NET 10 API</span>
+        <span class="arrow">→ mood text →</span>
+        <span class="box box-orange">OpenAI API</span>
+        <br style="width:100%"/>
+        <span class="box box-orange">float[1536]</span>
+        <span class="arrow">→</span>
+        <span class="box box-green">.NET 10 API</span>
+        <span class="arrow">→ <code>&lt;=&gt;</code> cosine query →</span>
+        <span class="box box-purple">PostgreSQL + pgvector</span>
+        <span class="arrow">→</span>
+        <span class="box box-purple">Top 3 rows</span>
+        <br style="width:100%"/>
+        <span class="box box-purple">JSON response</span>
+        <span class="arrow">→</span>
+        <span class="box box-green">.NET 10 API</span>
+        <span class="arrow">→</span>
+        <span class="box box-blue">React renders cards</span>
+      </div>
+    </div>
+
+    <p>
+      <strong>Why embeddings beat keyword search:</strong> Compare the mood <em>"something heartwarming for the family"</em>
+      with the movie description for <em>Coco</em> — no words overlap, yet the embedding vectors point in
+      the same direction because both texts share similar meaning. pgvector measures this with cosine
+      distance and the app finds the match automatically.
+    </p>
+
+    <h3>Seeding vs. Recommending</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Operation</th><th>Endpoint</th><th>OpenAI calls</th><th>DB operation</th></tr></thead>
+        <tbody>
+          <tr><td>Seed</td><td><code>POST /api/seed</code></td><td>30 (once per movie description)</td><td>DELETE all, INSERT 30 rows with vectors</td></tr>
+          <tr><td>Recommend</td><td><code>POST /api/recommend</code></td><td>1 (mood text)</td><td>SELECT with cosine ORDER BY, LIMIT 3</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── ARCHITECTURE ── -->
+  <section id="architecture">
+    <h2>🏗️ Architecture</h2>
+    <pre><code><span class="cmt">┌─────────────────────────┐     HTTP (JSON)      ┌──────────────────────────────────┐</span>
+<span class="cmt">│  movie-ui  (React+Vite) │ ──────────────────▶  │  MovieApi  (ASP.NET Core .NET 10) │</span>
+<span class="cmt">│  localhost:5173         │                       │  localhost:5053                  │</span>
+<span class="cmt">│                         │ ◀──────────────────   │                                  │</span>
+<span class="cmt">│  • App.jsx              │    top 3 results      │  • MoviesController.cs           │</span>
+<span class="cmt">│  • App.css              │                       │    POST /api/seed                │</span>
+<span class="cmt">└─────────────────────────┘                       │    POST /api/recommend           │</span>
+                                                    <span class="cmt">│  • Program.cs (DI + CORS)       │</span>
+                                                    <span class="cmt">│  • MovieContext.cs (EF Core)    │</span>
+                                                    <span class="cmt">└────────────────┬─────────────────┘</span>
+                                                                     <span class="cmt">│ Npgsql + pgvector</span>
+                                                                     <span class="cmt">▼</span>
+                                                    <span class="cmt">┌────────────────────────────────────┐</span>
+                                                    <span class="cmt">│  PostgreSQL (local)                │</span>
+                                                    <span class="cmt">│  Database : moviedb                │</span>
+                                                    <span class="cmt">│  Table    : movies                 │</span>
+                                                    <span class="cmt">│  Column   : embedding vector(1536) │</span>
+                                                    <span class="cmt">└────────────────┬───────────────────┘</span>
+                                                                     <span class="cmt">│ 1 API call per text</span>
+                                                                     <span class="cmt">▼</span>
+                                                    <span class="cmt">┌────────────────────────────────────┐</span>
+                                                    <span class="cmt">│  OpenAI API                        │</span>
+                                                    <span class="cmt">│  Model : text-embedding-3-small    │</span>
+                                                    <span class="cmt">│  Output: float[1536]               │</span>
+                                                    <span class="cmt">└────────────────────────────────────┘</span></code></pre>
+  </section>
+
+  <!-- ── PROJECT STRUCTURE ── -->
+  <section id="project-structure">
+    <h2>📁 Project Structure</h2>
+    <div class="tree">
+      <span class="dir">AI-RECOMMENDATION-ENGINE/</span><br/>
+      ├── <span class="file">README.md</span>  <span class="ann">← repo overview + full docs</span><br/>
+      ├── <span class="file">.gitignore</span>  <span class="ann">← excludes secrets, bin/, obj/, node_modules/</span><br/>
+      ├── <span class="dir">docs/</span><br/>
+      │   └── <span class="file">index.html</span>  <span class="ann">← this file</span><br/>
+      ├── <span class="dir">MovieApi/</span>  <span class="ann">← ASP.NET Core Web API (backend)</span><br/>
+      │   ├── <span class="dir">Controllers/</span><br/>
+      │   │   └── <span class="file">MoviesController.cs</span>  <span class="ann">← seed + recommend endpoint logic</span><br/>
+      │   ├── <span class="file">MovieContext.cs</span>  <span class="ann">← EF Core DbContext + Movie model</span><br/>
+      │   ├── <span class="file">Program.cs</span>  <span class="ann">← DI registration, CORS policy, app startup</span><br/>
+      │   ├── <span class="file">appsettings.json</span>  <span class="ann">← base config (no secrets)</span><br/>
+      │   ├── <span class="file">appsettings.Development.json</span>  <span class="ann">← local secrets (NOT committed)</span><br/>
+      │   ├── <span class="file">appsettings.Development.example.json</span>  <span class="ann">← safe onboarding template</span><br/>
+      │   ├── <span class="file">MovieApi.http</span>  <span class="ann">← HTTP scratch file for manual testing</span><br/>
+      │   └── <span class="file">MovieApi.csproj</span>  <span class="ann">← .NET project + NuGet packages</span><br/>
+      └── <span class="dir">movie-ui/</span>  <span class="ann">← React + Vite frontend</span><br/>
+          ├── <span class="dir">src/</span><br/>
+          │   ├── <span class="file">App.jsx</span>  <span class="ann">← main component: input + cards + fetch logic</span><br/>
+          │   ├── <span class="file">App.css</span>  <span class="ann">← animated background, glass panel, card styles</span><br/>
+          │   └── <span class="file">index.css</span>  <span class="ann">← global box-sizing + margin reset</span><br/>
+          ├── <span class="file">index.html</span><br/>
+          ├── <span class="file">vite.config.js</span><br/>
+          └── <span class="file">package.json</span>
+    </div>
+  </section>
+
+  <!-- ── TECH STACK ── -->
+  <section id="tech-stack">
+    <h2>🛠️ Tech Stack</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Layer</th><th>Technology</th><th>Version</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Frontend</td><td>React</td><td>19</td><td>UI components and state management</td></tr>
+          <tr><td>Frontend</td><td>Vite</td><td>8</td><td>Dev server and production build tooling</td></tr>
+          <tr><td>Backend</td><td>ASP.NET Core</td><td>.NET 10</td><td>REST Web API framework</td></tr>
+          <tr><td>Backend</td><td>C#</td><td>13</td><td>Application language</td></tr>
+          <tr><td>Backend</td><td>OpenAI SDK</td><td>2.10.0</td><td>Calls <code>text-embedding-3-small</code></td></tr>
+          <tr><td>Database</td><td>PostgreSQL</td><td>14+</td><td>Relational data store</td></tr>
+          <tr><td>Database</td><td>pgvector</td><td>0.3.x</td><td>Vector similarity extension (<code>&lt;=&gt;</code>)</td></tr>
+          <tr><td>ORM</td><td>Entity Framework Core</td><td>10</td><td>DB schema mapping and migrations</td></tr>
+          <tr><td>DB Driver</td><td>Npgsql</td><td>10</td><td>Raw SQL for vector INSERT / SELECT</td></tr>
+          <tr><td>Vector Type</td><td>Pgvector.EntityFrameworkCore</td><td>0.3.0</td><td><code>Vector</code> C# type for the embedding column</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── API REFERENCE ── -->
+  <section id="api-reference">
+    <h2>🔌 API Reference</h2>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/api/seed</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Deletes all existing movies, calls OpenAI once per description (30 total), and inserts all movies with their embedding vectors. Call this once after initial database setup.</p>
+        <p><strong>Request body:</strong> None required.</p>
+        <p><strong>Success response (200 OK):</strong></p>
+        <pre><code><span class="kw">{</span>
+  <span class="str">"seededCount"</span><span class="op">:</span> <span class="num">30</span>
+<span class="kw">}</span></code><span class="lang-tag">JSON</span></pre>
+        <div class="callout callout-yellow">
+          ⚠️ Seeding makes 30 API calls to OpenAI and takes 30–60 seconds. It wipes all existing rows first.
+        </div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/api/recommend</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Converts a mood string into a vector, queries pgvector with cosine distance, and returns the three closest matching movies.</p>
+        <p><strong>Request body:</strong></p>
+        <pre><code><span class="kw">{</span>
+  <span class="str">"mood"</span><span class="op">:</span> <span class="str">"funny and clever"</span>
+<span class="kw">}</span></code><span class="lang-tag">JSON</span></pre>
+        <p><strong>Success response (200 OK):</strong></p>
+        <pre><code><span class="op">[</span>
+  <span class="kw">{</span>
+    <span class="str">"title"</span><span class="op">:</span> <span class="str">"Pulp Fiction"</span><span class="op">,</span>
+    <span class="str">"genre"</span><span class="op">:</span> <span class="str">"CRIME / DRAMA"</span><span class="op">,</span>
+    <span class="str">"description"</span><span class="op">:</span> <span class="str">"Interconnected stories of hitmen, a boxer, and a gangster's wife..."</span><span class="op">,</span>
+    <span class="str">"score"</span><span class="op">:</span> <span class="num">0.357</span>
+  <span class="kw">}</span><span class="op">,</span>
+  <span class="kw">{</span>
+    <span class="str">"title"</span><span class="op">:</span> <span class="str">"The Grand Budapest Hotel"</span><span class="op">,</span>
+    <span class="str">"genre"</span><span class="op">:</span> <span class="str">"COMEDY"</span><span class="op">,</span>
+    <span class="str">"description"</span><span class="op">:</span> <span class="str">"A legendary concierge and his lobby boy get entangled in a murder mystery..."</span><span class="op">,</span>
+    <span class="str">"score"</span><span class="op">:</span> <span class="num">0.325</span>
+  <span class="kw">}</span><span class="op">,</span>
+  <span class="kw">{</span>
+    <span class="str">"title"</span><span class="op">:</span> <span class="str">"Knives Out"</span><span class="op">,</span>
+    <span class="str">"genre"</span><span class="op">:</span> <span class="str">"MYSTERY / COMEDY"</span><span class="op">,</span>
+    <span class="str">"description"</span><span class="op">:</span> <span class="str">"A detective investigates the death of a wealthy crime novelist..."</span><span class="op">,</span>
+    <span class="str">"score"</span><span class="op">:</span> <span class="num">0.318</span>
+  <span class="kw">}</span>
+<span class="op">]</span></code><span class="lang-tag">JSON</span></pre>
+        <p><strong>Error response (400 Bad Request):</strong> <span class="inline-code">"Mood is required."</span></p>
+        <div class="callout callout-blue">
+          The <code>score</code> field is cosine similarity (0–1). Higher means more semantically similar to the mood query.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DATABASE ── -->
+  <section id="database">
+    <h2>🗄️ Database Schema</h2>
+    <pre><code><span class="sql-kw">CREATE EXTENSION IF NOT EXISTS</span> vector<span class="op">;</span>
+
+<span class="sql-kw">CREATE TABLE</span> movies <span class="op">(</span>
+    id          <span class="typ">SERIAL PRIMARY KEY</span><span class="op">,</span>
+    title       <span class="typ">TEXT NOT NULL</span><span class="op">,</span>
+    genre       <span class="typ">TEXT NOT NULL</span><span class="op">,</span>
+    description <span class="typ">TEXT NOT NULL</span><span class="op">,</span>
+    embedding   vector<span class="op">(</span><span class="num">1536</span><span class="op">),</span>        <span class="cmt">-- 1536 floats from text-embedding-3-small</span>
+    created_at  <span class="typ">TIMESTAMP DEFAULT NOW()</span>
+<span class="op">);</span></code><span class="lang-tag">SQL</span></pre>
+    <p>
+      The <span class="inline-code">embedding vector(1536)</span> column stores one float per embedding dimension.
+      pgvector adds the <span class="inline-code">&lt;=&gt;</span> cosine distance operator directly in SQL, so
+      no external library is needed at query time.
+    </p>
+  </section>
+
+  <!-- ── KEY CODE ── -->
+  <section id="key-code">
+    <h2>💻 Key Code Explained</h2>
+
+    <h3>1 · Generating an embedding (MoviesController.cs)</h3>
+    <p>The controller uses the OpenAI SDK to convert any text string into a <span class="inline-code">Vector</span> ready for PostgreSQL:</p>
+    <pre><code><span class="cmt">// Constructor: build EmbeddingClient from injected OpenAIClient</span>
+_embeddingClient = openAIClient.<span class="fn">GetEmbeddingClient</span>(<span class="str">"text-embedding-3-small"</span>)<span class="op">;</span>
+
+<span class="cmt">// Helper method: text → Vector</span>
+<span class="kw">private async</span> <span class="typ">Task</span><span class="op">&lt;</span><span class="typ">Vector</span><span class="op">&gt;</span> <span class="fn">GenerateVectorAsync</span>(<span class="typ">string</span> text<span class="op">,</span> <span class="typ">CancellationToken</span> ct)
+<span class="op">{</span>
+    <span class="kw">var</span> result <span class="op">=</span> <span class="kw">await</span> _embeddingClient.<span class="fn">GenerateEmbeddingAsync</span>(text<span class="op">,</span> cancellationToken<span class="op">:</span> ct)<span class="op">;</span>
+    <span class="kw">float</span><span class="op">[]</span> floats <span class="op">=</span> result.Value.<span class="fn">ToFloats</span>().<span class="fn">ToArray</span>()<span class="op">;</span>  <span class="cmt">// 1536 floats</span>
+    <span class="kw">return new</span> <span class="typ">Vector</span>(floats)<span class="op">;</span>                          <span class="cmt">// Pgvector.Vector</span>
+<span class="op">}</span></code><span class="lang-tag">C#</span></pre>
+
+    <h3>2 · pgvector cosine distance query (MoviesController.cs)</h3>
+    <p>The recommend endpoint executes raw SQL with the <span class="inline-code">&lt;=&gt;</span> operator:</p>
+    <pre><code><span class="sql-kw">SELECT</span> title<span class="op">,</span> genre<span class="op">,</span> description<span class="op">,</span>
+       <span class="num">1</span> <span class="op">- (</span>embedding <span class="op">&lt;=&gt;</span> @queryVec<span class="op">::</span>vector<span class="op">)</span> <span class="sql-kw">AS</span> score
+<span class="sql-kw">FROM</span> movies
+<span class="sql-kw">ORDER BY</span> embedding <span class="op">&lt;=&gt;</span> @queryVec<span class="op">::</span>vector
+<span class="sql-kw">LIMIT</span> <span class="num">3</span><span class="op">;</span></code><span class="lang-tag">SQL</span></pre>
+    <div class="callout callout-blue">
+      <strong>&lt;=&gt;</strong> returns cosine <em>distance</em> (0 = same direction, 2 = opposite).
+      Subtracting from 1 converts it to cosine <em>similarity</em> so higher score = better match.
+    </div>
+
+    <h3>3 · Multi-port API fallback (App.jsx)</h3>
+    <p>The frontend tries the backend on multiple ports before giving up:</p>
+    <pre><code><span class="kw">const</span> API_BASES <span class="op">=</span> <span class="op">[</span>
+  import.meta.env.<span class="typ">VITE_API_BASE_URL</span><span class="op">,</span>   <span class="cmt">// optional env var override</span>
+  <span class="str">"http://localhost:5053"</span><span class="op">,</span>              <span class="cmt">// primary backend port</span>
+  <span class="str">"http://localhost:5000"</span>               <span class="cmt">// fallback</span>
+<span class="op">].</span><span class="fn">filter</span>(<span class="typ">Boolean</span>)<span class="op">;</span>
+
+<span class="kw">for</span> (<span class="kw">const</span> base <span class="kw">of</span> API_BASES) <span class="op">{</span>
+  <span class="kw">try</span> <span class="op">{</span>
+    <span class="kw">const</span> res <span class="op">=</span> <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`</span><span class="op">${</span>base<span class="op">}</span><span class="str">/api/recommend`</span><span class="op">,</span> <span class="op">{</span> <span class="cmt">/* ... */</span> <span class="op">});</span>
+    <span class="kw">if</span> (res.<span class="fn">ok</span>) <span class="op">{</span> <span class="cmt">/* use result and break */</span> <span class="kw">break</span><span class="op">; }</span>
+  <span class="op">}</span> <span class="kw">catch</span> <span class="op">{</span> <span class="cmt">/* try next port */</span> <span class="op">}</span>
+<span class="op">}</span></code><span class="lang-tag">JSX</span></pre>
+
+    <h3>4 · CORS policy (Program.cs)</h3>
+    <p>The backend allows any localhost port — no config change needed when the frontend port changes:</p>
+    <pre><code>policy.<span class="fn">SetIsOriginAllowed</span>(origin <span class="op">=&gt;</span> <span class="op">{</span>
+    <span class="kw">if</span> (<span class="op">!</span><span class="typ">Uri</span>.<span class="fn">TryCreate</span>(origin<span class="op">,</span> <span class="typ">UriKind</span>.Absolute<span class="op">,</span> <span class="kw">out var</span> uri)) <span class="kw">return false</span><span class="op">;</span>
+    <span class="kw">return</span> uri.Host.<span class="fn">Equals</span>(<span class="str">"localhost"</span><span class="op">,</span> <span class="typ">StringComparison</span>.OrdinalIgnoreCase)<span class="op">;</span>
+<span class="op">})</span></code><span class="lang-tag">C#</span></pre>
+
+    <h3>5 · Movie model (MovieContext.cs)</h3>
+    <p>The EF Core entity maps directly to the PostgreSQL <span class="inline-code">movies</span> table, including the pgvector column:</p>
+    <pre><code><span class="kw">public class</span> <span class="typ">Movie</span>
+<span class="op">{</span>
+    <span class="kw">public int</span>     Id          <span class="op">{</span> <span class="kw">get</span><span class="op">;</span> <span class="kw">set</span><span class="op">;</span> <span class="op">}</span>
+    <span class="kw">public string</span>  Title       <span class="op">{</span> <span class="kw">get</span><span class="op">;</span> <span class="kw">set</span><span class="op">;</span> <span class="op">}</span> <span class="op">=</span> <span class="str">""</span><span class="op">;</span>
+    <span class="kw">public string</span>  Genre       <span class="op">{</span> <span class="kw">get</span><span class="op">;</span> <span class="kw">set</span><span class="op">;</span> <span class="op">}</span> <span class="op">=</span> <span class="str">""</span><span class="op">;</span>
+    <span class="kw">public string</span>  Description <span class="op">{</span> <span class="kw">get</span><span class="op">;</span> <span class="kw">set</span><span class="op">;</span> <span class="op">}</span> <span class="op">=</span> <span class="str">""</span><span class="op">;</span>
+    <span class="kw">public</span> <span class="typ">Vector</span><span class="op">?</span> Embedding   <span class="op">{</span> <span class="kw">get</span><span class="op">;</span> <span class="kw">set</span><span class="op">;</span> <span class="op">}</span>  <span class="cmt">// Pgvector.Vector — maps to vector(1536)</span>
+    <span class="kw">public</span> <span class="typ">DateTime</span> CreatedAt  <span class="op">{</span> <span class="kw">get</span><span class="op">;</span> <span class="kw">set</span><span class="op">;</span> <span class="op">}</span>
+<span class="op">}</span></code><span class="lang-tag">C#</span></pre>
+  </section>
+
+  <!-- ── SETUP ── -->
+  <section id="setup">
+    <h2>🚀 Local Setup</h2>
+
+    <h3>Prerequisites</h3>
+    <p>
+      <span class="tag">.NET 10 SDK</span>
+      <span class="tag">Node.js 20+</span>
+      <span class="tag">PostgreSQL 14+</span>
+      <span class="tag">pgvector extension</span>
+      <span class="tag">OpenAI API key</span>
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Clone the repository</h4>
+          <pre><code>git clone https://github.com/fouzanyousufee1/AI-RECOMMENDATION-ENGINE.git
+cd AI-RECOMMENDATION-ENGINE</code><span class="lang-tag">bash</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Create the PostgreSQL database</h4>
+          <pre><code><span class="sql-kw">CREATE DATABASE</span> moviedb<span class="op">;</span>
+<span class="cmt">\c moviedb</span>
+<span class="sql-kw">CREATE EXTENSION IF NOT EXISTS</span> vector<span class="op">;</span>
+<span class="sql-kw">CREATE TABLE</span> movies <span class="op">(</span>
+    id          <span class="typ">SERIAL PRIMARY KEY</span><span class="op">,</span>
+    title       <span class="typ">TEXT NOT NULL</span><span class="op">,</span>
+    genre       <span class="typ">TEXT NOT NULL</span><span class="op">,</span>
+    description <span class="typ">TEXT NOT NULL</span><span class="op">,</span>
+    embedding   vector<span class="op">(</span><span class="num">1536</span><span class="op">),</span>
+    created_at  <span class="typ">TIMESTAMP DEFAULT NOW()</span>
+<span class="op">);</span></code><span class="lang-tag">SQL</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Configure backend secrets</h4>
+          <p>Copy the example file and fill in your values:</p>
+          <pre><code><span class="cmt"># PowerShell</span>
+Copy-Item MovieApi\appsettings.Development.example.json `
+          MovieApi\appsettings.Development.json</code><span class="lang-tag">powershell</span></pre>
+          <p>Edit <span class="inline-code">MovieApi/appsettings.Development.json</span>:</p>
+          <pre><code><span class="kw">{</span>
+  <span class="str">"ConnectionStrings"</span><span class="op">:</span> <span class="kw">{</span>
+    <span class="str">"Default"</span><span class="op">:</span> <span class="str">"Host=localhost;Database=moviedb;Username=YOUR_USER;Password=YOUR_PASS"</span>
+  <span class="kw">}</span><span class="op">,</span>
+  <span class="str">"OpenAI"</span><span class="op">:</span> <span class="kw">{</span>
+    <span class="str">"ApiKey"</span><span class="op">:</span> <span class="str">"sk-..."</span>
+  <span class="kw">}</span>
+<span class="kw">}</span></code><span class="lang-tag">JSON</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Install frontend dependencies</h4>
+          <pre><code>cd movie-ui
+npm install</code><span class="lang-tag">powershell</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── RUNNING ── -->
+  <section id="running">
+    <h2>▶️ Running the App</h2>
+
+    <h3>Terminal 1 — Start the backend</h3>
+    <pre><code>cd MovieApi
+dotnet run --urls <span class="str">"http://localhost:5053"</span></code><span class="lang-tag">powershell</span></pre>
+
+    <h3>Terminal 2 — Seed the database (once only)</h3>
+    <pre><code>Invoke-RestMethod -Method Post -Uri <span class="str">"http://localhost:5053/api/seed"</span>
+<span class="cmt"># Expected output: { seededCount: 30 }</span></code><span class="lang-tag">powershell</span></pre>
+    <div class="callout callout-yellow">
+      Only call seed when the database is empty or you want to reset all movie data. It deletes all rows and calls OpenAI 30 times.
+    </div>
+
+    <h3>Terminal 3 — Start the frontend</h3>
+    <pre><code>cd movie-ui
+npm run dev</code><span class="lang-tag">powershell</span></pre>
+    <p>Open <strong>http://localhost:5173</strong> in your browser.</p>
+
+    <h3>Test a recommendation from the terminal</h3>
+    <pre><code>Invoke-RestMethod -Method Post `
+  -Uri <span class="str">"http://localhost:5053/api/recommend"</span> `
+  -ContentType <span class="str">"application/json"</span> `
+  -Body <span class="str">'{"mood":"scary and suspenseful"}'</span></code><span class="lang-tag">powershell</span></pre>
+  </section>
+
+  <!-- ── FRONTEND ── -->
+  <section id="frontend">
+    <h2>🎨 Frontend UI</h2>
+    <p>
+      The frontend is a single-page React application with an animated background featuring drifting
+      radial gradients and floating colour blobs, a glass-morphism input panel, and a responsive movie card grid.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><code>src/App.jsx</code></td><td>Main component — mood input, API fetch with multi-port fallback, renders movie cards</td></tr>
+          <tr><td><code>src/App.css</code></td><td>Animated background (<code>driftGradient</code>, <code>floatBlob</code> keyframes), glass panel, search row, card styles</td></tr>
+          <tr><td><code>src/index.css</code></td><td>Global <code>box-sizing</code> reset and body/html margin reset</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Key CSS animations</h3>
+    <pre><code><span class="cmt">/* Background colour drift */</span>
+<span class="op">@keyframes</span> driftGradient <span class="op">{</span>
+  <span class="num">0%</span>   <span class="op">{</span> background-position<span class="op">:</span>   <span class="num">0% 50%</span><span class="op">; }</span>
+  <span class="num">100%</span> <span class="op">{</span> background-position<span class="op">: 100% 50%</span><span class="op">; }</span>
+<span class="op">}</span>
+
+<span class="cmt">/* Floating colour blobs via pseudo-elements */</span>
+<span class="op">@keyframes</span> floatBlob <span class="op">{</span>
+  <span class="num">0%</span>   <span class="op">{</span> transform<span class="op">:</span> translate(<span class="num">0px, 0px</span>)    scale(<span class="num">1</span>)<span class="op">; }</span>
+  <span class="num">50%</span>  <span class="op">{</span> transform<span class="op">:</span> translate(<span class="num">30px, -20px</span>) scale(<span class="num">1.05</span>)<span class="op">; }</span>
+  <span class="num">100%</span> <span class="op">{</span> transform<span class="op">:</span> translate(<span class="num">0px, 0px</span>)    scale(<span class="num">1</span>)<span class="op">; }</span>
+<span class="op">}</span></code><span class="lang-tag">CSS</span></pre>
+
+    <h3>Frontend scripts</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td><code>npm run dev</code></td><td>Start Vite dev server with hot module reload on localhost:5173</td></tr>
+          <tr><td><code>npm run build</code></td><td>Compile and bundle to <code>dist/</code> for production deployment</td></tr>
+          <tr><td><code>npm run preview</code></td><td>Serve the <code>dist/</code> build locally to verify output</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── CONFIG ── -->
+  <section id="config">
+    <h2>⚙️ Configuration Reference</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Key</th><th>File</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>ConnectionStrings:Default</code></td><td>appsettings.Development.json</td><td>PostgreSQL connection string — host, db name, user, password</td></tr>
+          <tr><td><code>OpenAI:ApiKey</code></td><td>appsettings.Development.json</td><td>Your OpenAI secret key starting with <code>sk-</code></td></tr>
+          <tr><td><code>VITE_API_BASE_URL</code></td><td>movie-ui/.env (optional)</td><td>Override the backend URL for the React app (defaults to localhost:5053)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-green">
+      <strong>Never commit real values.</strong> The <code>appsettings.Development.json</code> file is excluded by <code>.gitignore</code>. Use <code>appsettings.Development.example.json</code> as the onboarding template.
+    </div>
+  </section>
+
+  <!-- ── SECURITY ── -->
+  <section id="security">
+    <h2>🔒 Security Notes</h2>
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">🔑</span>
+        <h4>No secrets in git</h4>
+        <p><code>appsettings.Development.json</code> is gitignored. Only the <code>.example</code> template is committed.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🌐</span>
+        <h4>CORS localhost-only</h4>
+        <p>The CORS policy only allows <code>localhost</code> origins. Do not use <code>AllowAnyOrigin</code> in production.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🛡️</span>
+        <h4>Parameterised SQL</h4>
+        <p>All database queries use named parameters via Npgsql. No string concatenation in SQL — no SQL injection risk.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">✅</span>
+        <h4>Input validation</h4>
+        <p>The recommend endpoint returns 400 if mood is null or whitespace before any DB or API call is made.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <p>AI Movie Recommendation Engine — built with .NET 10, React 19, PostgreSQL, and OpenAI</p>
+  <p style="margin-top:6px;">Made by <a href="https://github.com/fouzanyousufee1" target="_blank" rel="noopener noreferrer">fouzanyousufee1</a></p>
+  <div class="footer-btns">
+    <a class="btn btn-profile" href="https://github.com/fouzanyousufee1" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.68 7.68 0 012 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub Profile
+    </a>
+    <a class="btn btn-repo" href="https://github.com/fouzanyousufee1/AI-RECOMMENDATION-ENGINE" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 16 16"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"/></svg>
+      View Repository
+    </a>
+  </div>
+</footer>
+
+</body>
+</html>

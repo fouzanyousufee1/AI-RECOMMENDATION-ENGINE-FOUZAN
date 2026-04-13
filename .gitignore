@@ -8,10 +8,12 @@
 # Track only the application folders for this repository
 !MovieApi/
 !movie-ui/
+!docs/
 
 # Re-include contents under tracked folders
 !MovieApi/**
 !movie-ui/**
+!docs/**
 
 # Backend build output
 MovieApi/bin/
